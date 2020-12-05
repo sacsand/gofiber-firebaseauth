@@ -3,6 +3,8 @@ package gofiberfirebaseauth
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
 
 	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +15,7 @@ type Config struct {
 	Next func(c *fiber.Ctx) bool
 	// Filter defines a function to skip middleware.
 	// Optional. Default: nil
-	Authorizer func(string) (bool, error)
+	Authorizer func(string, string) (bool, error)
 
 	// Skip Email Check.
 	// Optional. Default: nil
@@ -45,12 +47,13 @@ type Config struct {
 
 // ConfigDefault is the default config
 var ConfigDefault = Config{
-	Next:               nil,
-	IgnoreUrls:         nil,
-	Authorizer:         nil,
-	ErrorHandler:       nil,
-	SuccessHandler:     nil,
-	CheckEmailVerified: false,
+	Next:                          nil,
+	IgnoreUrls:                    nil,
+	Authorizer:                    nil,
+	ErrorHandler:                  nil,
+	SuccessHandler:                nil,
+	CheckEmailVerified:            false,
+	CheckEmailVerifiedIgnoredUrls: nil,
 }
 
 // Initialize the gofiber
@@ -76,20 +79,32 @@ func configDefault(config ...Config) Config {
 
 	// Default Authorizer function
 	if cfg.Authorizer == nil {
-		cfg.Authorizer = func(IDToken string) (bool, error) {
+		cfg.Authorizer = func(IDToken string, CurrentURL string) (bool, error) {
 			client, err := cfg.FirebaseApp.Auth(context.Background())
 			// Verify IDToken
 			token, err := client.VerifyIDToken(context.Background(), IDToken)
-
+			log.Printf("fireauth config not found")
+			fmt.Println(CurrentURL)
 			// Throw error for bad token
 			if err != nil {
 				return false, errors.New("Malformed Token")
 			}
+			log.Printf("fireauth config not found")
 			// IF CheckEmailVerified enable in config check email is verified
 			if cfg.CheckEmailVerified {
-				// Claim email_verified from token
-				if token.Claims["email_verified"].(bool) {
-					return false, errors.New("Email not verified")
+				checkEmail := false
+				if cfg.CheckEmailVerifiedIgnoredUrls != nil && len(cfg.CheckEmailVerifiedIgnoredUrls) > 0 {
+					for i := range cfg.IgnoreUrls {
+						if cfg.CheckEmailVerifiedIgnoredUrls[i] == CurrentURL {
+							checkEmail = true
+						}
+					}
+				}
+				if checkEmail {
+					// Claim email_verified from token
+					if token.Claims["email_verified"].(bool) {
+						return false, errors.New("Email not verified")
+					}
 				}
 			}
 

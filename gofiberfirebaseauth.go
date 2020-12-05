@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// New - Main
+// New - Signature Function
 func New(config Config) fiber.Handler {
 	// Init config
 	cfg := configDefault(config)
@@ -22,8 +22,9 @@ func New(config Config) fiber.Handler {
 		if cfg.Next != nil && cfg.Next(c) {
 			return c.Next()
 		}
-		// 1) Resolve current route
-		url := c.Method() + " " + c.Path()
+		// 1) Construc the url to compare
+		url := c.Method() + "::" + c.Path()
+
 		// TODO add support for route with params and quarries
 		// r := c.Route()
 		// fmt.Println(r.Method, r.Path, r.Params, r.Handlers)
@@ -45,13 +46,13 @@ func New(config Config) fiber.Handler {
 		}
 
 		// 4) Validate the IdToken
-		IsPass, err := cfg.Authorizer(IDToken)
+		IsPass, err := cfg.Authorizer(IDToken, url)
 
 		// 5) IF Id token passed return SucessHandler
 		if IsPass {
 			return cfg.SuccessHandler(c)
 		}
-
+		// 6) IF not return error
 		return cfg.ErrorHandler(c, err)
 	}
 }
