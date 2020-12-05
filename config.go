@@ -14,8 +14,6 @@ type Config struct {
 
 	Authorizer func(string) (bool, error)
 
-	Unauthorized fiber.Handler
-
 	// Skip Email Check.
 	// Optional. Default: nil
 	CheckEmailVerified bool
@@ -24,6 +22,8 @@ type Config struct {
 	// Optional. Default: nil
 	Filter func(*fiber.Ctx) bool
 
+	// New firebase authntication object
+	// Mandatory. Default: nil
 	FirebaseApp *firebase.App
 
 	// SuccessHandler defines a function which is executed for a valid token.
@@ -47,7 +47,7 @@ var ConfigDefault = Config{
 	Next:               nil,
 	IgnoreUrls:         nil,
 	Authorizer:         nil,
-	Unauthorized:       nil,
+	ErrorHandler:       nil,
 	CheckEmailVerified: false,
 }
 
@@ -66,14 +66,15 @@ func configDefault(config ...Config) Config {
 		cfg.Next = ConfigDefault.Next
 	}
 
+	// Default Authorizer function
 	if cfg.Authorizer == nil {
 		cfg.Authorizer = func(IDToken string) (bool, error) {
 			client, err := cfg.FirebaseApp.Auth(context.Background())
-			// verify idTo
+			// Verify IDToken
 			token, err := client.VerifyIDToken(context.Background(), IDToken)
-			// fmt.Println(err)
+
 			if cfg.CheckEmailVerified {
-				// check email is verified
+				// Check email is verified
 				if token.Claims["email_verified"].(bool) {
 					return false, errors.New("Email not verified")
 				}
@@ -87,13 +88,6 @@ func configDefault(config ...Config) Config {
 		}
 	}
 
-	// if cfg.Unauthorized == nil {
-	// 	cfg.Unauthorized = func(c *fiber.Ctx) error {
-	// 		//c.Set(fiber.HeaderWWWAuthenticate, "basic realm="+cfg.Realm)
-	// 		return c.SendStatus(fiber.StatusUnauthorized)
-	// 	}
-	// }
-
 	if cfg.ErrorHandler == nil {
 		cfg.ErrorHandler = func(c *fiber.Ctx, err error) error {
 			if err.Error() == "Missing Token" {
@@ -101,6 +95,10 @@ func configDefault(config ...Config) Config {
 			}
 
 			if err.Error() == "Malformed Token" {
+				return c.Status(fiber.StatusBadRequest).SendString("Missing or malformed Token")
+			}
+
+			if err.Error() == "Email not verified" {
 				return c.Status(fiber.StatusBadRequest).SendString("Missing or malformed Token")
 			}
 
