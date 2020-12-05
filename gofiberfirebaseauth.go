@@ -7,7 +7,6 @@ package gofiberfirebaseauth
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -47,8 +46,8 @@ func New(config Config) fiber.Handler {
 
 		// 4) Validate the IdToken
 		IsPass, err := cfg.Authorizer(IDToken)
-		fmt.Println(IsPass)
-		// IF Id token passed
+
+		// 5) IF Id token passed
 		if IsPass {
 			return c.Next()
 		}

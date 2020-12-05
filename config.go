@@ -28,7 +28,7 @@ type Config struct {
 
 	// SuccessHandler defines a function which is executed for a valid token.
 	// Optional. Default: nil
-	SuccesHandler fiber.Handler
+	SuccessHandler fiber.Handler
 
 	// ErrorHandler defines a function which is executed for an invalid token.
 	// It may be used to define a custom JWT error.
@@ -48,6 +48,7 @@ var ConfigDefault = Config{
 	IgnoreUrls:         nil,
 	Authorizer:         nil,
 	ErrorHandler:       nil,
+	SuccessHandler:     nil,
 	CheckEmailVerified: false,
 }
 
@@ -66,6 +67,12 @@ func configDefault(config ...Config) Config {
 		cfg.Next = ConfigDefault.Next
 	}
 
+	if cfg.SuccessHandler == nil {
+		cfg.SuccessHandler = func(c *fiber.Ctx) error {
+			return c.Next()
+		}
+	}
+
 	// Default Authorizer function
 	if cfg.Authorizer == nil {
 		cfg.Authorizer = func(IDToken string) (bool, error) {
@@ -73,21 +80,23 @@ func configDefault(config ...Config) Config {
 			// Verify IDToken
 			token, err := client.VerifyIDToken(context.Background(), IDToken)
 
+			// Throw error for bad token
+			if err != nil {
+				return false, errors.New("Malformed Token")
+			}
+			// IF CheckEmailVerified enable in config check email is verified
 			if cfg.CheckEmailVerified {
-				// Check email is verified
+				// Claim email_verified from token
 				if token.Claims["email_verified"].(bool) {
 					return false, errors.New("Email not verified")
 				}
-			}
-
-			if err != nil {
-				return false, errors.New("Malformed Token")
 			}
 
 			return true, nil
 		}
 	}
 
+	// Default Error Handler
 	if cfg.ErrorHandler == nil {
 		cfg.ErrorHandler = func(c *fiber.Ctx, err error) error {
 			if err.Error() == "Missing Token" {
