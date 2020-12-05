@@ -28,7 +28,7 @@ func New(config Config) fiber.Handler {
 		// r := c.Route()
 		// fmt.Println(r.Method, r.Path, r.Params, r.Handlers)
 
-		// 2) Compare with current route
+		// 2) If url is ignored return to Next middleware
 		if cfg.IgnoreUrls != nil && len(cfg.IgnoreUrls) > 0 {
 			for i := range cfg.IgnoreUrls {
 				if cfg.IgnoreUrls[i] == url {
@@ -47,9 +47,9 @@ func New(config Config) fiber.Handler {
 		// 4) Validate the IdToken
 		IsPass, err := cfg.Authorizer(IDToken)
 
-		// 5) IF Id token passed
+		// 5) IF Id token passed return SucessHandler
 		if IsPass {
-			return c.Next()
+			return cfg.SuccessHandler(c)
 		}
 
 		return cfg.ErrorHandler(c, err)

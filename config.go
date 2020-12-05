@@ -11,7 +11,8 @@ import (
 // Config defines the config for goFiber middleware
 type Config struct {
 	Next func(c *fiber.Ctx) bool
-
+	// Filter defines a function to skip middleware.
+	// Optional. Default: nil
 	Authorizer func(string) (bool, error)
 
 	// Skip Email Check.
