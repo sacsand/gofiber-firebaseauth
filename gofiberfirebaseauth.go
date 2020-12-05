@@ -1,8 +1,13 @@
+// 🚀 Fiber is an Express inspired web framework written in Go with 💖
+// 📌 API Documentation: https://fiber.wiki
+// 📝 Github Repository: https://github.com/gofiber/fiber
+// Special thanks to : https://github.com/LeafyCode/express-firebase-auth
+
 package gofiberfirebaseauth
 
 import (
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,7 +16,7 @@ import (
 func New(config Config) fiber.Handler {
 	// Init config
 	cfg := configDefault(config)
-	// Return new handler
+	// Return authed handler
 	return func(c *fiber.Ctx) error {
 
 		// Don't execute middleware if Next returns true
@@ -37,61 +42,17 @@ func New(config Config) fiber.Handler {
 		IDToken := c.Get(fiber.HeaderAuthorization)
 
 		if len(IDToken) == 0 {
-			fmt.Println("no autorization header is present" + c.Path())
-			return cfg.Unauthorized(c)
-
+			return cfg.ErrorHandler(c, errors.New("Missing Token"))
 		}
+
 		// 4) Validate the IdToken
-		IsPass := cfg.Authorizer(IDToken)
+		IsPass, err := cfg.Authorizer(IDToken)
+		fmt.Println(IsPass)
 		// IF Id token passed
 		if IsPass {
-			log.Fatalf("User authenticated")
 			return c.Next()
 		}
 
-		return cfg.Unauthorized(c)
+		return cfg.ErrorHandler(c, err)
 	}
 }
-
-// func (auth *Auth) CreateCustomToken(userID string, claims interface{}) (string, error) {
-// 	if auth.app.privateKey == nil {
-// 		return "", ErrRequireServiceAccount
-// 	}
-// 	now := time.Now()
-// 	payload := &customClaims{
-// 		Issuer:    auth.app.clientEmail,
-// 		Subject:   auth.app.clientEmail,
-// 		Audience:  customTokenAudience,
-// 		IssuedAt:  now.Unix(),
-// 		ExpiresAt: now.Add(time.Hour).Unix(),
-// 		UserID:    userID,
-// 		Claims:    claims,
-// 	}
-// 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, payload)
-// 	return token.SignedString(auth.app.privateKey)
-// }
-
-// func TestVerifyIDToken(t *testing.T) {
-// 	app := initApp()
-// 	firAuth := app.Auth()
-
-// 	assert.NotNil(t, app)
-// 	assert.NotNil(t, firAuth)
-
-// 	// my claims
-// 	myClaims := make(map[string]string)
-// 	myClaims["name"] = "go-firebase-admin"
-// 	myClaims["kid"] = "polo"
-
-// 	token, err := firAuth.CreateCustomToken("uid", myClaims)
-
-// 	fmt.Printf("%s", token)
-
-// 	assert.Nil(t, err)
-// 	assert.NotNil(t, token)
-
-// 	claims, err := firAuth.VerifyIDToken(token)
-
-// 	assert.Nil(t, err)
-// 	assert.NotNil(t, claims)
-// }
