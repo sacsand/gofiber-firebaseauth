@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
@@ -12,18 +11,15 @@ import (
 
 // Config defines the config for goFiber middleware
 type Config struct {
-	Next func(c *fiber.Ctx) bool
 	// Filter defines a function to skip middleware.
 	// Optional. Default: nil
+	Next func(c *fiber.Ctx) bool
+
 	Authorizer func(string, string) (bool, error)
 
 	// Skip Email Check.
 	// Optional. Default: nil
 	CheckEmailVerified bool
-
-	// Filter defines a function to skip middleware.
-	// Optional. Default: nil
-	Filter func(*fiber.Ctx) bool
 
 	// New firebase authntication object
 	// Mandatory. Default: nil
@@ -56,7 +52,7 @@ var ConfigDefault = Config{
 	CheckEmailVerifiedIgnoredUrls: nil,
 }
 
-// Initialize the gofiber
+// Initializer
 func configDefault(config ...Config) Config {
 	// Return default config if nothing provided
 	if len(config) < 1 {
@@ -65,6 +61,12 @@ func configDefault(config ...Config) Config {
 
 	// Override default config
 	cfg := config[0]
+
+	if cfg.FirebaseApp == nil {
+		fmt.Println("**********************************")
+		fmt.Println("PLEASE PASS Firebase App in config")
+		fmt.Println("**********************************")
+	}
 
 	// Set default values
 	if cfg.Next == nil {
@@ -83,13 +85,13 @@ func configDefault(config ...Config) Config {
 			client, err := cfg.FirebaseApp.Auth(context.Background())
 			// Verify IDToken
 			token, err := client.VerifyIDToken(context.Background(), IDToken)
-			log.Printf("fireauth config not found")
+
 			fmt.Println(CurrentURL)
 			// Throw error for bad token
 			if err != nil {
 				return false, errors.New("Malformed Token")
 			}
-			log.Printf("fireauth config not found")
+
 			// IF CheckEmailVerified enable in config check email is verified
 			if cfg.CheckEmailVerified {
 				checkEmail := false
@@ -100,6 +102,7 @@ func configDefault(config ...Config) Config {
 						}
 					}
 				}
+				fmt.Println(token.Claims["email_verified"].(bool))
 				if checkEmail {
 					// Claim email_verified from token
 					if token.Claims["email_verified"].(bool) {
@@ -131,19 +134,6 @@ func configDefault(config ...Config) Config {
 
 		}
 	}
-
-	// Note :: Removed desualt configuration since the go envirment complication
-	// if cfg.FirebaseApp == nil {
-	// 	// If the user has passed an initialized firebase app, use that
-	// 	// or initialize one using the serviceAccount object.
-	// 	opt := option.WithCredentialsFile("fireauth-firebase-adminsdk.json")
-	// 	app, err := firebase.NewApp(context.Background(), nil, opt)
-
-	// 	if err != nil {
-	// 		log.Fatalf("error getting Auth client: %v\n", err)
-	// 	}
-	// 	cfg.FirebaseApp = app
-	// }
 
 	return cfg
 }
