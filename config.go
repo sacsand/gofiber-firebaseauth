@@ -108,7 +108,7 @@ func configDefault(config ...Config) Config {
 				fmt.Println(token.Claims["email_verified"].(bool))
 				if checkEmail {
 					// Claim email_verified from token
-					if token.Claims["email_verified"].(bool) {
+					if !token.Claims["email_verified"].(bool) {
 						return false, errors.New("Email not verified")
 					}
 				}
