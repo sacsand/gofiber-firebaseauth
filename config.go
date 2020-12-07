@@ -63,9 +63,9 @@ func configDefault(config ...Config) Config {
 	cfg := config[0]
 
 	if cfg.FirebaseApp == nil {
-		fmt.Println("**********************************")
-		fmt.Println("PLEASE PASS Firebase App in config")
-		fmt.Println("**********************************")
+		fmt.Println("****************************************************************")
+		fmt.Println("gofiberfirebaseauth :: Error PLEASE PASS Firebase App in Config")
+		fmt.Println("*****************************************************************")
 	}
 
 	// Set default values
@@ -82,6 +82,9 @@ func configDefault(config ...Config) Config {
 	// Default Authorizer function
 	if cfg.Authorizer == nil {
 		cfg.Authorizer = func(IDToken string, CurrentURL string) (bool, error) {
+			if cfg.FirebaseApp == nil {
+				return false, errors.New("Missing Firebase App Object")
+			}
 			client, err := cfg.FirebaseApp.Auth(context.Background())
 			// Verify IDToken
 			token, err := client.VerifyIDToken(context.Background(), IDToken)
@@ -128,6 +131,10 @@ func configDefault(config ...Config) Config {
 
 			if err.Error() == "Email not verified" {
 				return c.Status(fiber.StatusBadRequest).SendString("Missing or malformed Token")
+			}
+
+			if err.Error() == "Missing Firebase App Object" {
+				return c.Status(fiber.StatusBadRequest).SendString("Missing or Invalid Firebase App Object")
 			}
 
 			return c.Status(fiber.StatusUnauthorized).SendString("Invalid or expired Token")

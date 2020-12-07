@@ -21,10 +21,11 @@ func init() {
 	}
 }
 
-// TEST for Malformed Token
+// 1  TEST for Malformed Token
 func TestWithMalformedToken(t *testing.T) {
-
-	t.Parallel()
+	fmt.Println("*************TEST 1 ***************")
+	fmt.Println("  ")
+	// t.Parallel()
 	app := fiber.New()
 	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	if !fileExi {
@@ -51,9 +52,9 @@ func TestWithMalformedToken(t *testing.T) {
 	// 6) test
 	resp, err := app.Test(req)
 
-	if err != nil {
-		t.Fatalf(`%s: %s`, t.Name(), err)
-	}
+	// if err != nil {
+	// 	t.Fatalf(`%s: %s`, t.Name(), err)
+	// }
 
 	if resp.StatusCode == fiber.StatusBadRequest || resp.StatusCode == fiber.StatusUnauthorized {
 		// t.Fatalf(`%s: %s`, t.Name(), err)
@@ -65,10 +66,12 @@ func TestWithMalformedToken(t *testing.T) {
 
 }
 
-// TEST for Ignore Url
+// 2 TEST for Ignore Url
 func TestIgnoreUrlsWorking(t *testing.T) {
+	fmt.Println("*************TEST 2 ***************")
+	fmt.Println("  ")
 
-	t.Parallel()
+	// t.Parallel()
 	app := fiber.New()
 	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	if !fileExi {
@@ -109,24 +112,15 @@ func TestIgnoreUrlsWorking(t *testing.T) {
 
 }
 
-// TEST for Ignore Url
+// 3 TEST for Ignore Url
 func TestWithoutFirebaseApp(t *testing.T) {
+	fmt.Println("*************TEST 3 ***************")
+	fmt.Println("  ")
 
-	t.Parallel()
+	// t.Parallel()
 	app := fiber.New()
-	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-	if !fileExi {
-		log.Println("fireauth config not found")
-	}
-	// 2) create firebase app
-	opt := option.WithCredentialsFile(file)
-	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
 
-	// 3) configure the gofiberfirebaseauth
-	app.Use(New(Config{
-		FirebaseApp: fireApp,
-	}))
-
+	// Config without firebase App object
 	app.Use(New(Config{}))
 
 	// 5) crete  test route
@@ -149,52 +143,3 @@ func TestWithoutFirebaseApp(t *testing.T) {
 	}
 
 }
-
-// // Test api passing a firebase App
-
-// func TestIgnoreUrls(t *testing.T) {
-
-// 	t.Parallel()
-
-// 	app := fiber.New()
-// 	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-// 	if !fileExi {
-// 		log.Println("fireauth config not found")
-// 	}
-// 	// 2) create firebase app
-// 	opt := option.WithCredentialsFile(file)
-// 	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
-
-// 	// 3) configure the gofiberfirebaseauth
-// 	app.Use(New(Config{
-// 		FirebaseApp: fireApp,
-// 		IgnoreUrls:  []string{"GET /testauth", "POST /testauth "},
-// 	}))
-// 	// 4) get id token from env
-// 	idToken, idExist := os.LookupEnv("ID_TOKEN")
-// 	if !idExist {
-// 		log.Println("no id token found")
-// 	}
-
-// 	// 5) Create  tests route
-// 	app.Get("/testauth", func(c *fiber.Ctx) error {
-// 		msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
-// 		return c.SendString(msg) // => Hello john 👋!
-// 	})
-
-// 	app.Post("/testauth", func(c *fiber.Ctx) error {
-// 		msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
-// 		return c.SendString(msg) // => Hello john 👋!
-// 	})
-
-// 	req1 := httptest.NewRequest("GET", "/testauth", nil)
-// 	req2 := httptest.NewRequest("GET", "/testauth", nil)
-// 	req1.Header.Set("Authorization", idToken)
-// 	req2.Header.Set("Authorization", idToken)
-// 	// 6) test
-// 	app.Test(req1)
-// 	app.Test(req2)
-
-// 	utils.AssertEqual(t, nil)
-
-// }
