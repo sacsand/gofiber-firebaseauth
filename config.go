@@ -15,6 +15,7 @@ type Config struct {
 	// Optional. Default: nil
 	Next func(c *fiber.Ctx) bool
 
+	// Token authorizer
 	Authorizer func(string, string) (bool, error)
 
 	// Skip Email Check.

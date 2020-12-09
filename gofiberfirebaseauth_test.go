@@ -143,3 +143,52 @@ func TestWithoutFirebaseApp(t *testing.T) {
 	}
 
 }
+
+// 2 TEST for Ignore Url
+func TestToken(t *testing.T) {
+	fmt.Println("*************TEST 4 ***************")
+	fmt.Println("  ")
+
+	// t.Parallel()
+	app := fiber.New()
+	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
+	idToken, isTokenExist := os.LookupEnv("ID_token")
+
+	if !fileExi || !isTokenExist {
+		log.Println("fireauth config or idToken is not found")
+	}
+	// 2) create firebase app
+	opt := option.WithCredentialsFile(file)
+	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
+
+	// 3) configure the gofiberfirebaseauth
+	app.Use(New(Config{
+		FirebaseApp: fireApp,
+	}))
+
+	app.Use(New(Config{
+		FirebaseApp: fireApp,
+		IgnoreUrls:  []string{"GET::/testauth", "POST::/testauth "},
+	}))
+
+	// 5) crete  test route
+	app.Get("/testauth", func(c *fiber.Ctx) error {
+		msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
+		return c.SendString(msg) // => Hello john 👋!
+	})
+
+	req := httptest.NewRequest("GET", "/testauth", nil)
+
+	req.Header.Set("Authorization", idToken)
+	// 6) test
+	_, err := app.Test(req)
+
+	// fmt.Println((resp))
+
+	if err != nil {
+		t.Fatalf(`%s: %s`, t.Name(), err)
+	} else {
+		fmt.Println("TEST case pass for IgnoreUrl check")
+	}
+
+}
