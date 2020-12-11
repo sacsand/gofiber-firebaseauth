@@ -91,7 +91,7 @@ func TestIgnoreUrlsWorking(t *testing.T) {
 		IgnoreUrls:  []string{"GET::/testauth", "POST::/testauth "},
 	}))
 
-	// 5) crete  test route
+	// 5) crete test route
 	app.Get("/testauth", func(c *fiber.Ctx) error {
 		msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
 		return c.SendString(msg) // => Hello john 👋!
@@ -144,15 +144,15 @@ func TestWithoutFirebaseApp(t *testing.T) {
 
 }
 
-// 2 TEST for Ignore Url
-func TestToken(t *testing.T) {
-	fmt.Println("*************TEST 4 ***************")
+// 2 TEST token with valid authorization token
+func TestTokenWithCorrectToken(t *testing.T) {
+	fmt.Println("*************TEST 5 ***************")
 	fmt.Println("  ")
 
 	// t.Parallel()
 	app := fiber.New()
 	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-	idToken, isTokenExist := os.LookupEnv("ID_token")
+	idToken, isTokenExist := os.LookupEnv("ID_TOKEN")
 
 	if !fileExi || !isTokenExist {
 		log.Println("fireauth config or idToken is not found")
@@ -161,21 +161,18 @@ func TestToken(t *testing.T) {
 	opt := option.WithCredentialsFile(file)
 	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
 
+	fmt.Println(idToken)
+
 	// 3) configure the gofiberfirebaseauth
 	app.Use(New(Config{
 		FirebaseApp: fireApp,
 	}))
 
-	app.Use(New(Config{
-		FirebaseApp: fireApp,
-		IgnoreUrls:  []string{"GET::/testauth", "POST::/testauth "},
-	}))
-
-	// 5) crete  test route
-	app.Get("/testauth", func(c *fiber.Ctx) error {
-		msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
-		return c.SendString(msg) // => Hello john 👋!
-	})
+	// // 5) crete  test route
+	// app.Get("/testauth", func(c *fiber.Ctx) error {
+	// 	msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
+	// 	return c.SendString(msg) // => Hello john 👋!
+	// })
 
 	req := httptest.NewRequest("GET", "/testauth", nil)
 

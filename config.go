@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	firebase "firebase.google.com/go"
+	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,16 +16,20 @@ type Config struct {
 	// Optional. Default: nil
 	Next func(c *fiber.Ctx) bool
 
+	// New firebase authntication object
+	// Mandatory. Default: nil
+	FirebaseApp *firebase.App
+
+	// New firebase authntication object
+	// Mandatory. Default: nil
+	ServiceAccount string
+
 	// Token authorizer
-	Authorizer func(string, string) (bool, error)
+	Authorizer func(string, string) (*auth.Token, error)
 
 	// Skip Email Check.
 	// Optional. Default: nil
 	CheckEmailVerified bool
-
-	// New firebase authntication object
-	// Mandatory. Default: nil
-	FirebaseApp *firebase.App
 
 	// SuccessHandler defines a function which is executed for a valid token.
 	// Optional. Default: nil
@@ -40,6 +45,10 @@ type Config struct {
 
 	// Ignore email verification for these routes
 	CheckEmailVerifiedIgnoredUrls []string
+
+	// Context key to store user information from the token into context.
+	// Optional. Default: "user".
+	ContextKey string
 }
 
 // ConfigDefault is the default config
@@ -51,6 +60,7 @@ var ConfigDefault = Config{
 	SuccessHandler:                nil,
 	CheckEmailVerified:            false,
 	CheckEmailVerifiedIgnoredUrls: nil,
+	ContextKey:                    "",
 }
 
 // Initializer
@@ -62,6 +72,10 @@ func configDefault(config ...Config) Config {
 
 	// Override default config
 	cfg := config[0]
+
+	if cfg.ContextKey == "" {
+		cfg.ContextKey = "user"
+	}
 
 	if cfg.FirebaseApp == nil {
 		fmt.Println("****************************************************************")
@@ -82,18 +96,17 @@ func configDefault(config ...Config) Config {
 
 	// Default Authorizer function
 	if cfg.Authorizer == nil {
-		cfg.Authorizer = func(IDToken string, CurrentURL string) (bool, error) {
+		cfg.Authorizer = func(IDToken string, CurrentURL string) (*auth.Token, error) {
 			if cfg.FirebaseApp == nil {
-				return false, errors.New("Missing Firebase App Object")
+				return nil, errors.New("Missing Firebase App Object")
 			}
 			client, err := cfg.FirebaseApp.Auth(context.Background())
 			// Verify IDToken
 			token, err := client.VerifyIDToken(context.Background(), IDToken)
 
-			fmt.Println(CurrentURL)
 			// Throw error for bad token
 			if err != nil {
-				return false, errors.New("Malformed Token")
+				return nil, errors.New("Malformed Token")
 			}
 
 			// IF CheckEmailVerified enable in config check email is verified
@@ -106,16 +119,16 @@ func configDefault(config ...Config) Config {
 						}
 					}
 				}
-				fmt.Println(token.Claims["email_verified"].(bool))
+
 				if checkEmail {
 					// Claim email_verified from token
 					if !token.Claims["email_verified"].(bool) {
-						return false, errors.New("Email not verified")
+						return nil, errors.New("Email not verified")
 					}
 				}
 			}
 
-			return true, nil
+			return token, nil
 		}
 	}
 

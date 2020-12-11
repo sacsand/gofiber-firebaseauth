@@ -7,7 +7,6 @@ package gofiberfirebaseauth
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -47,19 +46,30 @@ func New(config Config) fiber.Handler {
 		}
 
 		// 4) Validate the IdToken
-		IsPass, err := cfg.Authorizer(IDToken, url)
-
-		fmt.Println(err)
-
+		token, err := cfg.Authorizer(IDToken, url)
+		// IF error return error handler
 		if err != nil {
 			return cfg.ErrorHandler(c, err)
 		}
 
-		// 5) IF Id token passed return SucessHandler
-		if IsPass {
+		// 5) IF Id token valid return SucessHandler
+		if token != nil {
+
+			type user struct {
+				email, emailVerified bool
+				userID               string
+			}
+
+			// store authenticated user in local context
+			c.Locals(cfg.ContextKey, user{
+				email:         token.Claims["email"].(bool),
+				emailVerified: token.Claims["email_verified"].(bool),
+				userID:        token.Claims["user_id"].(string),
+			})
+
 			return cfg.SuccessHandler(c)
 		}
-		// 6) IF not return error
+		// 6) Else IF not return error
 		return cfg.ErrorHandler(c, err)
 	}
 }
