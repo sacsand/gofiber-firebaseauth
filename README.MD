@@ -94,10 +94,10 @@ This package adds the `user` object returned by firebase to context key `user`. 
 
 user object type
 ```
-        	type user struct {
-				email, emailVerified bool
-				userID               string
-			}
+type user struct{
+	email, emailVerified bool
+	userID               string
+}
 
 ```
 
@@ -112,10 +112,13 @@ user object type
 
 ### Setting up Dev
 
-Clone the repo and set your firebase credentials in your .env file
+Clone the repo and set your firebase credentials in your .env file\
 example::\
-GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"\
+
+```
+GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-auth-admin.json"\
 ID_TOKEN = "eyryursdkdjksjdks"  	
+```
 
 
 ## Versioning
