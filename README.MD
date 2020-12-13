@@ -1,4 +1,4 @@
-# Gofiber Firebase Auth Middleware (-- Under Testing)
+# Gofiber Firebase Auth Middleware 
 
 Authenticate your endpoints with [Firebase Authentication ](https://github.com/LeafyCode/express-firebase-auth/).
 
@@ -113,10 +113,10 @@ type user struct{
 ### Setting up Dev
 
 Clone the repo and set your firebase credentials in your .env file\
-example::\
+example::
 
 ```
-GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-auth-admin.json"\
+GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-auth-admin.json"
 ID_TOKEN = "eyryursdkdjksjdks"  	
 ```
 
