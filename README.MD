@@ -90,7 +90,16 @@ You **must** provide already initialized `FirebaseApp` app.
 You cannot initialize two firebase apps.
 
 This package adds the `user` object returned by firebase to context key `user`. You can use that inside your functions.
-(you have option to configure the ContextKey. Chekck the configarstion available table )
+(you have option to configure the ContextKey. Check the configarstion available table )
+
+user object type
+```
+        	type user struct {
+				email, emailVerified bool
+				userID               string
+			}
+
+```
 
 
 
@@ -103,15 +112,15 @@ This package adds the `user` object returned by firebase to context key `user`. 
 
 ### Setting up Dev
 
-Clone the repo and set your firebase credentials in your .env file  
-example::  
-GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"  
+Clone the repo and set your firebase credentials in your .env file\  
+example::\
+GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"\
 ID_TOKEN = "eyryursdkdjksjdks"  	
 
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [link to tags on this repository](/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [link to tags on this repository](/releases).
 
 ## Style guide
 
