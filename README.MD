@@ -32,12 +32,12 @@ import (
 
 ```go
 
-// Provide a minimal config
+    // Provide a minimal config
     app.Use(gofiberfirebaseauth.New(Config{
     	FirebaseApp: FirebaseApp,
     }))
 
-// Or extend your config for customization
+    // Or extend your config for customization
 	app.Use(gofiberfirebaseauth.New(Config{
 	
 	// New firebase authntication object
@@ -59,8 +59,8 @@ import (
 	// Authorizer defines a function which authenticate the Authorization token and return the authenticated token
 	// Optional. Default: nil
 	Authorizer: func(IDToken string, CurrentURL string) (*auth.Token, error){
-		// create your own authentication here 
-		// this retuen firbase id token
+    // create your own authentication here 
+	// this retuen firbase id token
 		return token, nil
 	},
 	// Context key to store user information from the token into context.
@@ -89,7 +89,8 @@ All available configuration
 You **must** provide already initialized `FirebaseApp` app.
 You cannot initialize two firebase apps.
 
-This package adds the `user` object returned by firebase to `res.locals.user`. You can use that inside your functions.
+This package adds the `user` object returned by firebase to context key `user`. You can use that inside your functions.
+(you have option to configure the ContextKey. Chekck the configarstion available table )
 
 
 
