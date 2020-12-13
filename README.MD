@@ -107,12 +107,12 @@ user object type
 
 ### Prerequisites
 -  Go 1.14 +
-- Configured Firebase Authentication App   GOOGLE_APPLICATION_CREDENTIALS
+- Configured Firebase Authentication App and GOOGLE_APPLICATION_CREDENTIALS(JSON file contain credential, get this from firebase console)
 - Valid ID_TOKEN , how to get https://github.com/sacsand/firebase-get-IdToken
 
 ### Setting up Dev
 
-Clone the repo and set your firebase credentials in your .env file\  
+Clone the repo and set your firebase credentials in your .env file
 example::\
 GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"\
 ID_TOKEN = "eyryursdkdjksjdks"  	
