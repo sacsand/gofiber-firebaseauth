@@ -23,9 +23,8 @@ func init() {
 
 // 1  TEST for Malformed Token
 func TestWithMalformedToken(t *testing.T) {
-	fmt.Println("*************TEST 1 ***************")
-	fmt.Println("  ")
-	// t.Parallel()
+
+	// 1) intialiae fiber app and firebase app
 	app := fiber.New()
 	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	if !fileExi {
@@ -52,13 +51,9 @@ func TestWithMalformedToken(t *testing.T) {
 	// 6) test
 	resp, err := app.Test(req)
 
-	// if err != nil {
-	// 	t.Fatalf(`%s: %s`, t.Name(), err)
-	// }
-
 	if resp.StatusCode == fiber.StatusBadRequest || resp.StatusCode == fiber.StatusUnauthorized {
 		// t.Fatalf(`%s: %s`, t.Name(), err)
-		fmt.Println("TEST case pass for Malformed Token Check")
+		fmt.Println("TEST case pass for TestWithMalformedToken")
 
 	} else {
 		log.Fatalf(`%s: %s`, t.Name(), err)
@@ -68,8 +63,6 @@ func TestWithMalformedToken(t *testing.T) {
 
 // 2 TEST for Ignore Url
 func TestIgnoreUrlsWorking(t *testing.T) {
-	fmt.Println("*************TEST 2 ***************")
-	fmt.Println("  ")
 
 	// t.Parallel()
 	app := fiber.New()
@@ -107,16 +100,13 @@ func TestIgnoreUrlsWorking(t *testing.T) {
 	if err != nil {
 		t.Fatalf(`%s: %s`, t.Name(), err)
 	} else {
-		fmt.Println("TEST case pass for IgnoreUrl check")
+		fmt.Println("Test case pass for TestIgnoreUrlsWorking")
 	}
 
 }
 
 // 3 TEST for Ignore Url
 func TestWithoutFirebaseApp(t *testing.T) {
-	fmt.Println("*************TEST 3 ***************")
-	fmt.Println("  ")
-
 	// t.Parallel()
 	app := fiber.New()
 
@@ -139,17 +129,14 @@ func TestWithoutFirebaseApp(t *testing.T) {
 	if err != nil {
 		t.Fatalf(`%s: %s`, t.Name(), err)
 	} else {
-		fmt.Println("TEST case pass for No FirebaseApp")
+		fmt.Println("Test case pass for TestWithoutFirebaseApp")
 	}
 
 }
 
-// 2 TEST token with valid authorization token
+//  TEST token with valid authorization token
 func TestTokenWithCorrectToken(t *testing.T) {
-	fmt.Println("*************TEST 5 ***************")
-	fmt.Println("  ")
 
-	// t.Parallel()
 	app := fiber.New()
 	file, fileExi := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
 	idToken, isTokenExist := os.LookupEnv("ID_TOKEN")
@@ -166,22 +153,22 @@ func TestTokenWithCorrectToken(t *testing.T) {
 		FirebaseApp: fireApp,
 	}))
 
-	// // 5) crete  test route
-	// app.Get("/testauth", func(c *fiber.Ctx) error {
-	// 	msg := fmt.Sprintf("Hello, %s 👋!", c.Params("name"))
-	// 	return c.SendString(msg) // => Hello john 👋!
-	// })
-
 	req := httptest.NewRequest("GET", "/testauth", nil)
 
 	req.Header.Set("Authorization", idToken)
 	// 6) test
-	_, err := app.Test(req)
+	resp, err := app.Test(req)
 
 	if err != nil {
 		t.Fatalf(`%s: %s`, t.Name(), err)
+	}
+
+	if resp.StatusCode == fiber.StatusBadRequest || resp.StatusCode == fiber.StatusUnauthorized {
+		// t.Fatalf(`%s: %s`, t.Name(), err)
+		fmt.Println("TEST case FAILED for TestTokenWithCorrectToken .. Provide Valid ID_TOKEN in your .env file")
+
 	} else {
-		fmt.Println("TEST case pass for IgnoreUrl check")
+		fmt.Println("Test Case pass for TestTokenWithCorrectToken")
 	}
 
 }
