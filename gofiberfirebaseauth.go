@@ -22,7 +22,7 @@ func New(config Config) fiber.Handler {
 		if cfg.Next != nil && cfg.Next(c) {
 			return c.Next()
 		}
-		// 1) Construc the url to compare
+		// 1) Construct the url to compare
 		url := c.Method() + "::" + c.Path()
 
 		// TODO add support for route with params and quarries

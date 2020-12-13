@@ -33,7 +33,7 @@ import (
 ```go
 
 // Provide a minimal config
-	app.Use(gofiberfirebaseauth.New(Config{
+    app.Use(gofiberfirebaseauth.New(Config{
     	FirebaseApp: FirebaseApp,
     }))
 
@@ -58,14 +58,10 @@ import (
 
 	// Authorizer defines a function which authenticate the Authorization token and return the authenticated token
 	// Optional. Default: nil
-	Authorizer: func(user, pass string) bool {
-		if user == "john" && pass == "doe" {
-			return true
-		}
-		if user == "admin" && pass == "123456" {
-			return true
-		}
-		return false
+	Authorizer: func(IDToken string, CurrentURL string) (*auth.Token, error){
+		// create your own authentication here 
+		// this retuen firbase id token
+		return token, nil
 	},
 	// Context key to store user information from the token into context.
 	// Optional. Default: "user".
@@ -107,9 +103,9 @@ This package adds the `user` object returned by firebase to `res.locals.user`. Y
 ### Setting up Dev
 
 Clone the repo and set your firebase credentials in your .env file  
-example:: 	
-GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json" ,	
-ID_TOKEN = "eyryursdkdjksjdks"	
+example::  
+GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"  
+ID_TOKEN = "eyryursdkdjksjdks"  	
 
 
 ## Versioning
@@ -124,6 +120,10 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## License
 
 [MIT licensed](./LICENSE).
+
+## TODO
+
+TODO add support for Ignore URLS to to skip route with params and quarries
 
 
 
