@@ -107,9 +107,9 @@ This package adds the `user` object returned by firebase to `res.locals.user`. Y
 ### Setting up Dev
 
 Clone the repo and set your firebase credentials in your .env file  
-example:: 
-GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"
-ID_TOKEN = "eyryursdkdjksjdks"
+example:: 	
+GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json" ,	
+ID_TOKEN = "eyryursdkdjksjdks"	
 
 
 ## Versioning
