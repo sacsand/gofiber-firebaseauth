@@ -161,8 +161,6 @@ func TestTokenWithCorrectToken(t *testing.T) {
 	opt := option.WithCredentialsFile(file)
 	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
 
-	fmt.Println(idToken)
-
 	// 3) configure the gofiberfirebaseauth
 	app.Use(New(Config{
 		FirebaseApp: fireApp,
@@ -179,8 +177,6 @@ func TestTokenWithCorrectToken(t *testing.T) {
 	req.Header.Set("Authorization", idToken)
 	// 6) test
 	_, err := app.Test(req)
-
-	// fmt.Println((resp))
 
 	if err != nil {
 		t.Fatalf(`%s: %s`, t.Name(), err)

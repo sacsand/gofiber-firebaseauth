@@ -10,26 +10,32 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Config defines the config for goFiber middleware
+// Config defines the config for middleware
 type Config struct {
-	// Filter defines a function to skip middleware.
-	// Optional. Default: nil
-	Next func(c *fiber.Ctx) bool
 
 	// New firebase authntication object
 	// Mandatory. Default: nil
 	FirebaseApp *firebase.App
 
-	// New firebase authntication object
-	// Mandatory. Default: nil
-	ServiceAccount string
-
-	// Token authorizer
-	Authorizer func(string, string) (*auth.Token, error)
+	// Ignore urls array
+	// Optional. Default: nil
+	IgnoreUrls []string
 
 	// Skip Email Check.
 	// Optional. Default: nil
 	CheckEmailVerified bool
+
+	// Ignore email verification for these routes
+	// Optional. Default: nil
+	CheckEmailVerifiedIgnoredUrls []string
+
+	// Filter defines a function to skip middleware.
+	// Optional. Default: nil
+	Next func(c *fiber.Ctx) bool
+
+	// Authorizer defines a function which authenticate the Authorization token and return the authenticated token
+	// Optional. Default: nil
+	Authorizer func(string, string) (*auth.Token, error)
 
 	// SuccessHandler defines a function which is executed for a valid token.
 	// Optional. Default: nil
@@ -37,14 +43,8 @@ type Config struct {
 
 	// ErrorHandler defines a function which is executed for an invalid token.
 	// It may be used to define a custom JWT error.
-	// Optional. Default: 401 Invalid or expired JWT
+	// Optional. Default: nil
 	ErrorHandler fiber.ErrorHandler
-
-	// Ignore urls array
-	IgnoreUrls []string
-
-	// Ignore email verification for these routes
-	CheckEmailVerifiedIgnoredUrls []string
 
 	// Context key to store user information from the token into context.
 	// Optional. Default: "user".
@@ -77,6 +77,7 @@ func configDefault(config ...Config) Config {
 		cfg.ContextKey = "user"
 	}
 
+	// Check Mandatory FirebaseApp is provided
 	if cfg.FirebaseApp == nil {
 		fmt.Println("****************************************************************")
 		fmt.Println("gofiberfirebaseauth :: Error PLEASE PASS Firebase App in Config")
