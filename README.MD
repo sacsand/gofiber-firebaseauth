@@ -31,6 +31,7 @@ import (
 
 
 ```go
+
 // Provide a minimal config
 	app.Use(gofiberfirebaseauth.New(Config{
     	FirebaseApp: FirebaseApp,
@@ -94,18 +95,22 @@ You cannot initialize two firebase apps.
 
 This package adds the `user` object returned by firebase to `res.locals.user`. You can use that inside your functions.
 
- # TODO  add developer guide and contribution guide
 
 
-## Developing
+## Developing and TESTING envirnment setup
 
 ### Prerequisites
 -  Go 1.14 +
-- Configured Firebase Authentication App 
+- Configured Firebase Authentication App   GOOGLE_APPLICATION_CREDENTIALS
+- Valid ID_TOKEN , how to get https://github.com/sacsand/firebase-get-IdToken
 
 ### Setting up Dev
 
-Clone the repo and set your firebase env file .env  in  GOOGLE_APPLICATION_CREDENTIALS
+Clone the repo and set your firebase credentials in your .env file  
+example:: 
+GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-admin.json"
+ID_TOKEN = "eyryursdkdjksjdks"
+
 
 ## Versioning
 
