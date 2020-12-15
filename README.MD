@@ -103,10 +103,10 @@ type user struct{
 
 
 
-## Developing and TESTING envirnment setup
+## Developing , TESTING and envirnment setup
 
 ### Prerequisites
--  Go 1.14 +
+- Go 1.14 +
 - Configured Firebase Authentication App and GOOGLE_APPLICATION_CREDENTIALS(JSON file contain credential, get this from firebase console)
 - Valid ID_TOKEN , how to get https://github.com/sacsand/firebase-get-IdToken
 
