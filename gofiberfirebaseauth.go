@@ -7,6 +7,7 @@ package gofiberfirebaseauth
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -25,9 +26,12 @@ func New(config Config) fiber.Handler {
 		// 1) Construct the url to compare
 		url := c.Method() + "::" + c.Path()
 
-		// TODO add support for route with params and quarries
-		// r := c.Route()
-		// fmt.Println(r.Method, r.Path, r.Params, r.Handlers)
+		// Experimental :: IF url contain any parms or querry
+		if c.Path() != c.OriginalURL() {
+			r := c.Route()
+			fmt.Println(r.Method, r.Path, r.Params, r.Handlers)
+			url = r.Method + "::" + r.Path
+		}
 
 		// 2) If url is ignored return to Next middleware
 		if cfg.IgnoreUrls != nil && len(cfg.IgnoreUrls) > 0 {
