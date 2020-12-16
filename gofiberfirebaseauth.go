@@ -23,10 +23,7 @@ func New(config Config) fiber.Handler {
 			return c.Next()
 		}
 		// 1) Construct the url to compare
-		// url := c.Method() + "::" + c.Path()
-		// Experimental
-		r := c.Route()
-		url := r.Method + "::" + r.Path
+		url := c.Method() + "::" + c.Path()
 
 		// Experimental :: IF url contain any parms or querry
 		// if c.Path() != c.OriginalURL() {
