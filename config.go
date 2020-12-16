@@ -1,3 +1,5 @@
+// 1.2.1-alpha
+
 package gofiberfirebaseauth
 
 import (

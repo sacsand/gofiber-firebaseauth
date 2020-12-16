@@ -24,6 +24,7 @@ func New(config Config) fiber.Handler {
 		}
 		// 1) Construct the url to compare
 		// url := c.Method() + "::" + c.Path()
+		// Experimental
 		r := c.Route()
 		url := r.Method + "::" + r.Path
 
