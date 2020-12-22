@@ -115,7 +115,7 @@ func TestWithMalformedToken(t *testing.T) {
 	// 	log.Println("fireauth config not found")
 	// }
 	// create firebase app
-	opt := option.WithCredentialsFile(serviceAccountJSON)
+	opt := option.WithCredentialsFile("./google-services.json")
 	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
 
 	// configure the gofiberfirebaseauth
