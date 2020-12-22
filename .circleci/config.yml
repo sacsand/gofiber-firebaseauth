@@ -45,7 +45,7 @@ jobs:
       - run:
           # Decode the base64 string
           name: export the path for SERVICE_ACCOUNT_JSON 
-          command: echo 'export SERVICE_ACCOUNT_JSON =google-services.json'  
+          command: echo 'export SERVICE_ACCOUNT_JSON = "./google-services.json'  
       - run:
           # Decode the base64 string
           name: ls
