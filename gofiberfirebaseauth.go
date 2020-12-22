@@ -43,7 +43,7 @@ func New(config Config) fiber.Handler {
 
 		// 3) Get token from header
 		IDToken := c.Get(fiber.HeaderAuthorization)
-
+		// Validate token
 		if len(IDToken) == 0 {
 			return cfg.ErrorHandler(c, errors.New("Missing Token"))
 		}
@@ -59,20 +59,20 @@ func New(config Config) fiber.Handler {
 		if token != nil {
 
 			type user struct {
-				email, emailVerified bool
-				userID               string
+				emailVerified bool
+				userID, email string
 			}
 
-			// store authenticated user in local context
+			// Set authenticated user info in local context
 			c.Locals(cfg.ContextKey, user{
-				email:         token.Claims["email"].(bool),
+				email:         token.Claims["email"].(string),
 				emailVerified: token.Claims["email_verified"].(bool),
 				userID:        token.Claims["user_id"].(string),
 			})
 
 			return cfg.SuccessHandler(c)
 		}
-		// 6) Else IF not return error
+		// 6) Else IF return error
 		return cfg.ErrorHandler(c, err)
 	}
 }
