@@ -74,8 +74,8 @@ All available configuration
 
 | Option                  | Value           |Config type
 | -------------           |-----------------------------------------------------------------------------------------------------------:|:------
-| `FirebaseApp`              | ([**Note1**](#note1)) An initialized firebase app. [Refer Firebase setup](https://firebase.google.com/docs/admin/setup)   | FirebaseApp *firebase.App
-| `IgnoredUrls`           | (*Optional*) An array of URLs where you need to skip the authentication.                                                  | IgnoreUrls []string
+| `FirebaseApp`              | ([**Note1**](#note2)) An initialized firebase app. [Refer Firebase setup](https://firebase.google.com/docs/admin/setup)   | FirebaseApp *firebase.App
+| `IgnoredUrls`           | ([**Note1**](#note3))(*Optional*) An array of URLs where you need to skip the authentication.                                                  | IgnoreUrls []string
 | `CheckEmailVerified`    | (*Optional*) (Default: **false**) If set to **true**, only users with a verified email will be allowed access.            | CheckEmailVerified bool
 | `CheckEmailVerifiedIgnoredUrls`    | (*Optional*) An array of URLs where you need to skip the email verified check.                                 | CheckEmailVerifiedIgnoredUrls []string
 | `Authorizer`    | (*Optional*), Default: nil , Authorizer defines a function which authenticate the Authorization token and return the authenticated token. Use this if you want to oevride token authorization |Authorizer func(string, string) (*auth.Token, error)
@@ -98,10 +98,16 @@ type user struct{
 	email, emailVerified bool
 	userID               string
 }
-
 ```
 
-
+ #### Note3
+  Ignore url accept array of string. URl format should follow below format\
+  `{METHOD}::/{url}`\
+  ex:\
+  GET::/login\
+  POST::/login
+  
+  IgnoreUrl supoort only routes without prams or querry . (PR are welcome).To ignore urls with param or quarry declare the routes before the middleware. 
 
 ## Developing , TESTING and envirnment setup
 
@@ -109,8 +115,8 @@ type user struct{
 - Go 1.14 +
 - Configured Firebase Authentication App and GOOGLE_APPLICATION_CREDENTIALS(JSON file contain credential, get this from firebase console)
 - Valid ID_TOKEN , how to get https://github.com/sacsand/firebase-get-IdToken
-
-### Setting up Dev
+ 
+### Setting up Deevelopment Envirnment for testing
 
 Clone the repo and set your firebase credentials in your .env file\
 example::
@@ -119,7 +125,8 @@ example::
 GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-auth-admin.json"
 ID_TOKEN = "eyryursdkdjksjdks"  	
 ```
-
+or
+There is example of this 
 
 ## Versioning
 
