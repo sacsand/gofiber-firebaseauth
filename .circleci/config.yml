@@ -26,9 +26,6 @@ jobs:
         # Export base64 encoded google-services.json
         # into local bash variables
       - run:
-          name: Export Google Services Json
-          command: echo 'export GOOGLE_SERVICE_JSON="$GOOGLE_SERVICE_JSON"' >> $BASH_ENV
-      - run:
           name: Export TEST_USER_EMAIL AND PASSWORD
           command: echo 'export TEST_USER_EMAIL="$TEST_USER_EMAIL" && TEST_USER_PASSWORD="$TEST_USER_PASSWORD"' >> $BASH_ENV
       - run:
@@ -39,9 +36,12 @@ jobs:
           name: Decode Google Services Json
           command: echo $GOOGLE_SERVICE_JSON | base64 -di > google-services.json 
       - run:
+          name: Export Google Services Json
+          command: echo 'export GOOGLE_SERVICE_JSON="$GOOGLE_SERVICE_JSON"' >> $BASH_ENV
+      - run:
           # Decode the base64 string
           name: export the path for SERVICE_ACCOUNT_JSON 
-          command: echo 'export SERVICE_ACCOUNT_JSON ="google-services.json"'     
+          command: echo 'export SERVICE_ACCOUNT_JSON =google-services.json'     
       - run: go test -v ./...
       # Refresh the cache 
       - run: curl https://sum.golang.org/lookup/github.com/sacsand/gofiber-firebaseauth@v1.3.0-beta
