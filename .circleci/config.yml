@@ -23,5 +23,19 @@ jobs:
 
       # specify any bash command here prefixed with `run: `
       - run: go get -v -t -d ./...
+        # Export base64 encoded google-services.json
+        # into local bash variables
+      - run:
+          name: Export Google Services Json
+          command: echo 'export GOOGLE_SERVICE_JSON="$GOOGLE_SERVICE_JSON"' >> $BASH_ENV
+      - run:
+          # Decode the base64 string
+          name: Decode Google Services Json
+          command: echo $GOOGLE_SERVICE_JSON | base64 -di > app/google-services.json 
+      - run:
+          # Decode the base64 string
+          name: export the path for SERVICE_ACCOUNT_JSON 
+          command: echo 'export SERVICE_ACCOUNT_JSON ="app/google-services.json"'     
+      - run: go test -v ./...
+      # Refresh the cache 
       - run: curl https://sum.golang.org/lookup/github.com/sacsand/gofiber-firebaseauth@v1.3.0-beta
-      # - run: go test -v ./...
