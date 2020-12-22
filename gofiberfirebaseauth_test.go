@@ -24,8 +24,12 @@ var IDToken string
 func init() {
 
 	// loads values from .env into the system
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
+	localDev := os.Getenv("STAGE") == ""
+
+	if localDev {
+		if err := godotenv.Load(); err != nil {
+			log.Print("No .env file found")
+		}
 	}
 	// Get idToken form firebase and save globally
 	getIDToken()
