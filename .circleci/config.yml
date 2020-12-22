@@ -50,6 +50,10 @@ jobs:
           # Decode the base64 string
           name: ls
           command: ls 
+      - run:
+          # Decode the base64 string
+          name: cat
+          command: cat google-services.json
       - run: go test -v ./...
       # Refresh the cache 
       - run: curl https://sum.golang.org/lookup/github.com/sacsand/gofiber-firebaseauth@v1.3.0-beta
