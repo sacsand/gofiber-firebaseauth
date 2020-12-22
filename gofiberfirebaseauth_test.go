@@ -109,10 +109,10 @@ func TestWithMalformedToken(t *testing.T) {
 
 	// intialiae fiber app and firebase app
 	app := fiber.New()
-	serviceAccountJSON, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
-	if !fileExi {
-		log.Println("fireauth config not found")
-	}
+	serviceAccountJSON := os.Getenv("SERVICE_ACCOUNT_JSON")
+	// if !fileExi {
+	// 	log.Println("fireauth config not found")
+	// }
 	// create firebase app
 	opt := option.WithCredentialsFile(serviceAccountJSON)
 	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
