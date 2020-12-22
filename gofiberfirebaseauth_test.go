@@ -109,7 +109,7 @@ func TestWithMalformedToken(t *testing.T) {
 
 	// intialiae fiber app and firebase app
 	app := fiber.New()
-	serviceAccountJSON := os.Getenv("SERVICE_ACCOUNT_JSON")
+	serviceAccountJSON := os.Getenv("GOOGLE_SERVICE_JSON")
 	// if !fileExi {
 	// 	log.Println("fireauth config not found")
 	// }
