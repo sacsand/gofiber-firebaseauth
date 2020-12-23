@@ -28,10 +28,7 @@ import (
 )
 ```
 
-
-
 ```go
-
     // Provide a minimal config
     app.Use(gofiberfirebaseauth.New(Config{
     	FirebaseApp: FirebaseApp,
@@ -67,7 +64,6 @@ import (
 	// Optional. Default: "user".
 	ContextKey : "authUser"
     }))
-
 ```
 
 All available configuration
@@ -113,20 +109,23 @@ type user struct{
 
 ### Prerequisites
 - Go 1.14 +
-- Configured Firebase Authentication App and GOOGLE_APPLICATION_CREDENTIALS(JSON file contain credential, get this from firebase console)
-- Valid ID_TOKEN , how to get https://github.com/sacsand/firebase-get-IdToken
+- Configured Firebase Authentication App and Google Service Account Credential (JSON file contain credential, get this from firebase console) And Web API Key. You can get all these config from Firebase Console.
+- And sample user created in firebase console . Need user email and password. 
+
  
-### Setting up Deevelopment Envirnment for testing
+### Setting up Development Envirnment for testing
 
 Clone the repo and set your firebase credentials in your .env file\
 example::
 
 ```
-GOOGLE_APPLICATION_CREDENTIALS = "path/firebase-auth-admin.json"
-ID_TOKEN = "eyryursdkdjksjdks"  	
+
+SERVICE_ACCOUNT_JSON = "path to service account credential json"
+WEB_API_KEY = 
+TEST_USER_EMAIL = ""
+TEST_USER_PASSWORD = ""
+  	
 ```
-or
-There is example of this 
 
 ## Versioning
 
