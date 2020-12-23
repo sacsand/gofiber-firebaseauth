@@ -103,7 +103,7 @@ type user struct{
   GET::/login\
   POST::/login
   
-  IgnoreUrl supoort only routes without prams or querry . (PR are welcome).To ignore urls with param or quarry declare the routes before the middleware. 
+  IgnoreUrl support only routes without params or querry . (PR are welcome).To ignore urls with param or quarry,  declare the routes before the middleware declration. 
 
 ## Developing , TESTING and envirnment setup
 

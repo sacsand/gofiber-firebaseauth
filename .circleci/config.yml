@@ -46,4 +46,4 @@ jobs:
           command: cat google-services.json
       - run: go test -v ./...
       # Refresh the cache of go module
-      - run: curl https://sum.golang.org/lookup/github.com/sacsand/gofiber-firebaseauth@v1.3.0-beta
+      - run: curl https://sum.golang.org/lookup/github.com/sacsand/gofiber-firebaseauth@v1.3.1-beta2
