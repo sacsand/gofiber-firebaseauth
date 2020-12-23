@@ -1,5 +1,8 @@
 .env
 fireauth-firebase-adminsdk.json
+service-account.json
+*.json // ignore any json file . 
+
 tmp
 .DS_Store
 .encodedFireSdk
