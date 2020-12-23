@@ -23,10 +23,9 @@ var IDToken string
 
 func init() {
 
-	// loads values from .env into the system
 	localDev := os.Getenv("STAGE") == ""
-
-	if localDev {
+	// loads values from .env into the system
+	if localDev { // no in build, only in local
 		if err := godotenv.Load(); err != nil {
 			log.Print("No .env file found")
 		}
@@ -35,20 +34,32 @@ func init() {
 	getIDToken()
 }
 
-// Get Id token using Firebase Auth Rest API https://firebase.google.com/docs/reference/rest/auth
+/**
+ *
+ *	Helper Functions
+ *
+ */
+
+// Get Idtoken by calling Firebase Auth Rest API. DOCS:: https://firebase.google.com/docs/reference/rest/auth
 func getIDToken() {
 
 	// curl 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=[API_KEY]' \
 	// -H 'Content-Type: application/json' \
 	// --data-binary '{"email":"[user@example.com]","password":"[PASSWORD]","returnSecureToken":true}'
 
+	// Load envirment variable
 	testUserEmail, emailExit := os.LookupEnv("TEST_USER_EMAIL")
 	testUserPassword, passExit := os.LookupEnv("TEST_USER_PASSWORD")
-
 	if !emailExit || !passExit {
 		log.Println("Please provide TEST_USER_EMAIL and TEST_USER_PASSWORD")
 	}
 
+	webAPIKey, keyExitx := os.LookupEnv("WEB_API_KEY")
+	if !keyExitx {
+		log.Println("WEB_API_KEY is not configured.Please add the WEB_API_KEY to your .env")
+	}
+
+	// preparing payload
 	type Payload struct {
 		Email             string `json:"email"`
 		Password          string `json:"password"`
@@ -62,16 +73,10 @@ func getIDToken() {
 	}
 	payloadBytes, err := json.Marshal(data)
 	if err != nil {
-		// handle err
+		log.Println("Error getting idToken")
 	}
-	// body := strings.NewReader(`{"email":"skodagoda@apm.mc","password":"sac1234","returnSecureToken":true}`)
+
 	body := bytes.NewReader(payloadBytes)
-
-	webAPIKey, keyExitx := os.LookupEnv("WEB_API_KEY")
-
-	if !keyExitx {
-		log.Println("WEB_API_KEY is not configured.Please add the WEB_API_KEY to your .env")
-	}
 
 	req, err := http.NewRequest("POST", "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key="+webAPIKey+"", body)
 	if err != nil {
@@ -85,9 +90,6 @@ func getIDToken() {
 		log.Println("Error generating IDToken")
 	}
 
-	// type response interface {
-	// }
-
 	type response struct {
 		IDToken string `json:"idToken"`
 	}
@@ -97,29 +99,50 @@ func getIDToken() {
 	if err != nil {
 		log.Println("Error Getting IDToken")
 	}
-	// fmt.Print(bodyResponse)
+
 	var Response response
 	json.Unmarshal(bodyResponse, &Response)
-	//fmt.Println(Response.IDToken)
 	IDToken = Response.IDToken
 }
+
+// Create FirebaseAuth
+func CreateFirebaseAuthApp() (*firebase.App, error) {
+
+	serviceAccountJSON, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
+
+	if !fileExi {
+		log.Println("fireauth config not found")
+	}
+
+	// Create a firebase app
+	opt := option.WithCredentialsFile(serviceAccountJSON)
+	fireApp, err := firebase.NewApp(context.Background(), nil, opt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return fireApp, nil
+
+}
+
+/**
+*
+*	TEST CASES
+*
+ */
 
 // 1  TEST for Malformed Token
 func TestWithMalformedToken(t *testing.T) {
 
 	// intialiae fiber app and firebase app
 	app := fiber.New()
-	serviceAccountJSON, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
-	if !fileExi {
-		log.Println("fireauth config not found")
+
+	fireApp, err := CreateFirebaseAuthApp()
+
+	if err != nil {
+		t.Fatalf(`%s: %s`, t.Name(), err)
 	}
-	fmt.Print(serviceAccountJSON)
-	// if !fileExi {
-	// 	log.Println("fireauth config not found")
-	// }
-	// create firebase app
-	opt := option.WithCredentialsFile(serviceAccountJSON)
-	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
 
 	// configure the gofiberfirebaseauth
 	app.Use(New(Config{
@@ -138,8 +161,12 @@ func TestWithMalformedToken(t *testing.T) {
 	// test
 	resp, err := app.Test(req)
 
+	if err != nil {
+		t.Fatalf(`%s: %s`, t.Name(), err)
+	}
+
 	if resp.StatusCode == fiber.StatusBadRequest || resp.StatusCode == fiber.StatusUnauthorized {
-		fmt.Println("TEST case pass for TestWithMalformedToken")
+		// fmt.Println("TEST case pass for TestWithMalformedToken")
 	} else {
 		log.Fatalf(`%s: %s`, t.Name(), err)
 	}
@@ -151,18 +178,13 @@ func TestIgnoreUrlsWorking(t *testing.T) {
 
 	// t.Parallel()
 	app := fiber.New()
-	serviceAccountJSON, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
-	if !fileExi {
-		log.Println("fireauth config not found")
-	}
-	// create firebase app
-	opt := option.WithCredentialsFile(serviceAccountJSON)
-	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
 
-	// configure the gofiberfirebaseauth
-	app.Use(New(Config{
-		FirebaseApp: fireApp,
-	}))
+	// Create firebase app
+	fireApp, errf := CreateFirebaseAuthApp()
+
+	if errf != nil {
+		t.Fatalf(`%s: %s`, t.Name(), errf)
+	}
 
 	app.Use(New(Config{
 		FirebaseApp: fireApp,
@@ -182,8 +204,6 @@ func TestIgnoreUrlsWorking(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf(`%s: %s`, t.Name(), err)
-	} else {
-		fmt.Println("Test case pass for TestIgnoreUrlsWorking")
 	}
 
 }
@@ -209,8 +229,6 @@ func TestWithoutFirebaseApp(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf(`%s: %s`, t.Name(), err)
-	} else {
-		fmt.Println("Test case pass for TestWithoutFirebaseApp")
 	}
 
 }
@@ -220,14 +238,11 @@ func TestTokenWithCorrectToken(t *testing.T) {
 
 	app := fiber.New()
 
-	serviceAccountJSON, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
-	if !fileExi {
-		log.Println("fireauth config not found")
-	}
+	fireApp, err := CreateFirebaseAuthApp()
 
-	// create firebase app
-	opt := option.WithCredentialsFile(serviceAccountJSON)
-	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		t.Fatalf(`%s: %s`, t.Name(), err)
+	}
 
 	// configure the gofiberfirebaseauth
 	app.Use(New(Config{
@@ -246,8 +261,6 @@ func TestTokenWithCorrectToken(t *testing.T) {
 
 	if resp.StatusCode == fiber.StatusBadRequest || resp.StatusCode == fiber.StatusUnauthorized {
 		fmt.Println("TEST case FAILED for TestTokenWithCorrectToken ")
-	} else {
-		fmt.Println("Test Case pass for TestTokenWithCorrectToken")
 	}
 
 }
