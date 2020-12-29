@@ -13,5 +13,5 @@ require (
 	golang.org/x/sys v0.0.0-20201107080550-4d91cf3a1aaf // indirect
 	google.golang.org/api v0.35.0
 	google.golang.org/appengine v1.6.7 // indirect
-	gorm.io/gorm v1.20.7
+	
 )
