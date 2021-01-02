@@ -1,10 +1,10 @@
-# Gofiber Firebase Auth Middleware 
+# Go Fiber Firebase Auth Middleware 
 
-Authenticate your endpoints with [Firebase Authentication ](https://github.com/LeafyCode/express-firebase-auth/).
+Authenticate your  endpoints with [Firebase Authentication ](https://github.com/LeafyCode/express-firebase-auth/).
 
 gofiberfirebase auth is inspired by npm package [express-firebase-auth](https://github.com/LeafyCode/express-firebase-auth/) .
 #### Note1
- This package design to work with only [Go Fiber Framework](https://github.com/gofiber/fiber) (Express inspired go framework)
+ This package design to work with  [Go Fiber Framework](https://github.com/gofiber/fiber) (Express inspired go framework)
 # Features
   - Authenticate the user using Firebase before running the function.
   - Ability to skip authentication on public API endpoints.
@@ -27,12 +27,15 @@ import (
   "github.com/sacsand/gofiberfirebaseauth"
 )
 ```
-
+Provide a minimal config
 ```go
     // Provide a minimal config
     app.Use(gofiberfirebaseauth.New(Config{
     	FirebaseApp: FirebaseApp,
     }))
+```
+Or extend your config for customization
+```go
 
     // Or extend your config for customization
 	app.Use(gofiberfirebaseauth.New(Config{
@@ -53,7 +56,8 @@ import (
 	// Optional. Default: nil
 	CheckEmailVerifiedIgnoredUrls :  []string{"GET::/login","POST::/create-user"}
 
-	// Authorizer defines a function which authenticate the Authorization token and return the authenticated token
+	// Authorizer defines a function which authenticate the Authorization token and return 
+	the authenticated token
 	// Optional. Default: nil
 	Authorizer: func(IDToken string, CurrentURL string) (*auth.Token, error){
     // create your own authentication here 
@@ -140,9 +144,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 [MIT licensed](./LICENSE).
 
-## TODO
 
-TODO add support for Ignore URLS to to skip route with params and quarries
 
 
 
