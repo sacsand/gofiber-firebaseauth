@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/sacsand/gofiber-firebaseauth/tree/master.svg?style=shield)](https://circleci.com/gh/sacsand/gofiber-firebaseauth/tree/master)
+[![CircleCI](https://circleci.com/gh/sacsand/gofiber-firebaseauth.svg?style=shield)](https://circleci.com/gh/sacsand/gofiber-firebaseauth)
 
 # Go Fiber Firebase Auth Middleware 
 
