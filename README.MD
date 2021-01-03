@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/sacsand/gofiber-firebaseauth/tree/master.svg?style=shield)](https://circleci.com/gh/sacsand/gofiber-firebaseauth/tree/master)
+
 # Go Fiber Firebase Auth Middleware 
 
 Authenticate your  endpoints with [Firebase Authentication ](https://github.com/LeafyCode/express-firebase-auth/).
