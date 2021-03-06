@@ -103,8 +103,8 @@ This package adds the `user` object returned by firebase to context key `user`. 
 user object type
 ```
 type user struct{
-	email, emailVerified bool
-	userID               string
+	emailVerified bool
+	userID, email string
 }
 ```
 
