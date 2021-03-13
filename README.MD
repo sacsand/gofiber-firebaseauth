@@ -63,7 +63,7 @@ Or extend your config for customization
 	// Optional. Default: nil
 	Authorizer: func(IDToken string, CurrentURL string) (*auth.Token, error){
     // create your own authentication here 
-	// this retuen firbase id token
+	// this return firbase id token
 		return token, nil
 	},
 	// Context key to store user information from the token into context.
