@@ -1,12 +1,11 @@
+# Go Fiber Firebase Auth Middleware 
 [![CircleCI](https://circleci.com/gh/sacsand/gofiber-firebaseauth.svg?style=shield)](https://circleci.com/gh/sacsand/gofiber-firebaseauth)
 
-# Go Fiber Firebase Auth Middleware 
+Authenticate your endpoints with [Firebase Authentication ](https://github.com/LeafyCode/express-firebase-auth/).
 
-Authenticate your  endpoints with [Firebase Authentication ](https://github.com/LeafyCode/express-firebase-auth/).
-
-gofiberfirebase auth is inspired by npm package [express-firebase-auth](https://github.com/LeafyCode/express-firebase-auth/) .
+gofiber-firebaseauth is inspired by npm package [express-firebase-auth](https://github.com/LeafyCode/express-firebase-auth/) .
 #### Note1
- This package design to work with  [Go Fiber Framework](https://github.com/gofiber/fiber) (Express inspired go framework)
+ This package is designed to work with [Go Fiber Framework](https://github.com/gofiber/fiber) (Express inspired go framework)
 # Features
   - Authenticate the user using Firebase before running the function.
   - Ability to skip authentication on public API endpoints.
@@ -16,9 +15,8 @@ gofiberfirebase auth is inspired by npm package [express-firebase-auth](https://
 In your gofiber app
 ```sh
 $ go get -u github.com/gofiber/fiber/v2
-$ go get gofiberfirebaseauth
+$ go get github.com/sacsand/gofiber-firebaseauth
 ```
-
 
 # Configure 
 In your app import the middleware
@@ -26,7 +24,7 @@ In your app import the middleware
 ```go
 import (
   "github.com/gofiber/fiber/v2"
-  "github.com/sacsand/gofiberfirebaseauth"
+  "github.com/sacsand/gofiber-firebaseauth"
 )
 ```
 Provide a minimal config
@@ -42,7 +40,7 @@ Or extend your config for customization
     // Or extend your config for customization
 	app.Use(gofiberfirebaseauth.New(Config{
 	
-	// New firebase authntication object
+	// New firebase authentication object
 	// Mandatory. Default: nil
 	FirebaseApp:  FirebaseApp
 
@@ -58,12 +56,12 @@ Or extend your config for customization
 	// Optional. Default: nil
 	CheckEmailVerifiedIgnoredUrls :  []string{"GET::/login","POST::/create-user"}
 
-	// Authorizer defines a function which authenticate the Authorization token and return 
-	the authenticated token
+	// Authorizer defines a function which authenticates the Authorization token and returns 
+	// the authenticated token
 	// Optional. Default: nil
 	Authorizer: func(IDToken string, CurrentURL string) (*auth.Token, error){
     // create your own authentication here 
-	// this retuen firbase id token
+	// this returns the firebase id token
 		return token, nil
 	},
 	// Context key to store user information from the token into context.
@@ -71,19 +69,27 @@ Or extend your config for customization
 	ContextKey : "authUser"
     }))
 ```
+Use user in your fiber app
+```go
+func Handler(ctx *fiber.Ctx) error {
+	// Get user stored in context
+	// Default: user
+	ctx.Locals("user")
+}
+```
 
 All available configuration
 
-| Option                  | Value           |Config type
-| -------------           |-----------------------------------------------------------------------------------------------------------:|:------
-| `FirebaseApp`              | ([**Note1**](#note2)) An initialized firebase app. [Refer Firebase setup](https://firebase.google.com/docs/admin/setup)   | FirebaseApp *firebase.App
-| `IgnoredUrls`           | ([**Note1**](#note3))(*Optional*) An array of URLs where you need to skip the authentication.                                                  | IgnoreUrls []string
-| `CheckEmailVerified`    | (*Optional*) (Default: **false**) If set to **true**, only users with a verified email will be allowed access.            | CheckEmailVerified bool
-| `CheckEmailVerifiedIgnoredUrls`    | (*Optional*) An array of URLs where you need to skip the email verified check.                                 | CheckEmailVerifiedIgnoredUrls []string
-| `Authorizer`    | (*Optional*), Default: nil , Authorizer defines a function which authenticate the Authorization token and return the authenticated token. Use this if you want to oevride token authorization |Authorizer func(string, string) (*auth.Token, error)
-| `ContextKey`    | (*Optional*), Default: "user" , Context key to store user information from the token into context.| ContextKey string
-| `SuccessHandler`    |	(*Optional*), Default:nil, SuccessHandler defines a function which is executed for a valid token.  | SuccessHandler fiber.Handler
-| `ErrorHandler`    |	(*Optional*), Default:nil, ErrorHandler defines a function which is executed for a invalid token. | ErrorHandler fiber.ErrorHandler
+| Option                          |                                                                                                                                                                                            Value | Config type                                          |
+| ------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------- |
+| `FirebaseApp`                   |                                                                       ([**Note1**](#note2)) An initialized firebase app. [Refer to Firebase setup](https://firebase.google.com/docs/admin/setup) | FirebaseApp *firebase.App                            |
+| `IgnoredUrls`                   |                                                                                                    ([**Note1**](#note3))(*Optional*) An array of URLs where you need to skip the authentication. | IgnoreUrls []string                                  |
+| `CheckEmailVerified`            |                                                                                   (*Optional*) (Default: **false**) If set to **true**, only users with a verified email will be allowed access. | CheckEmailVerified bool                              |
+| `CheckEmailVerifiedIgnoredUrls` |                                                                                                                   (*Optional*) An array of URLs where you need to skip the email verified check. | CheckEmailVerifiedIgnoredUrls []string               |
+| `Authorizer`                    | (*Optional*), Default: nil , Authorizer defines a function which authenticates the Authorization token and returns the authenticated token. Use this if you want to override token authorization | Authorizer func(string, string) (*auth.Token, error) |
+| `ContextKey`                    |                                                                                               (*Optional*), Default: "user" , Context key to store user information from the token into context. | ContextKey string                                    |
+| `SuccessHandler`                |                                                                                                (*Optional*), Default:nil, SuccessHandler defines a function which is executed for a valid token. | SuccessHandler fiber.Handler                         |
+| `ErrorHandler`                  |                                                                                                (*Optional*), Default:nil, ErrorHandler defines a function which is executed for a invalid token. | ErrorHandler fiber.ErrorHandler                      |
                             
 
 
@@ -92,37 +98,38 @@ You **must** provide already initialized `FirebaseApp` app.
 You cannot initialize two firebase apps.
 
 This package adds the `user` object returned by firebase to context key `user`. You can use that inside your functions.
-(you have option to configure the ContextKey. Check the configarstion available table )
+(you have option to configure the ContextKey. Check the configuration table above )
 
 user object type
 ```
 type user struct{
-	email, emailVerified bool
-	userID               string
+	emailVerified bool
+	userID, email string
 }
 ```
 
  #### Note3
   Ignore url accept array of string. URl format should follow below format\
   `{METHOD}::/{url}`\
-  ex:\
+  Example: \
   GET::/login\
   POST::/login
   
-  IgnoreUrl support only routes without params or querry . (PR are welcome).To ignore urls with param or quarry,  declare the routes before the middleware declration. 
+  IgnoreUrl only supports routes without params or query . (PR are welcome).To ignore urls with param or query,  declare the routes before the middleware declaration. 
 
-## Developing , TESTING and envirnment setup
+## Developing , TESTING and environment setup
 
 ### Prerequisites
 - Go 1.14 +
-- Configured Firebase Authentication App and Google Service Account Credential (JSON file contain credential, get this from firebase console) And Web API Key. You can get all these config from Firebase Console.
-- And sample user created in firebase console . Need user email and password. 
+- Configured Firebase app and Google Service Account Credential (JSON containing admin credentials). Refer to [Firebase setup](https://firebase.google.com/docs/admin/setup) 
+- Web API Key
+- Sample user email and password from firebase. You can manually create a user from the firebase console.
 
+You can get all the configurations from Firebase Console.
  
-### Setting up Development Envirnment for testing
+### Setting up Development Environment for testing
 
-Clone the repo and set your firebase credentials in your .env file\
-example::
+Clone the repo and set your firebase credentials in your .env file
 
 ```
 
@@ -139,15 +146,9 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Style guide
 
- [Uber](https://github.com/uber-go/guide/blob/master/style.md ) stryle guide
+ [Uber](https://github.com/uber-go/guide/blob/master/style.md ) style guide
 
 
 ## License
 
 [MIT licensed](./LICENSE).
-
-
-
-
-
-
