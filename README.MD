@@ -60,7 +60,7 @@ Or extend your config for customization
 	// the authenticated token
 	// Optional. Default: nil
 	Authorizer: func(IDToken string, CurrentURL string) (*auth.Token, error){
-    // create your own authentication here 
+        // create your own authentication here 
 	// this returns the firebase id token
 		return token, nil
 	},
