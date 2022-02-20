@@ -58,13 +58,13 @@ func New(config Config) fiber.Handler {
 		// 5) IF IdToken valid return SucessHandler
 		if token != nil {
 
-			type user struct {
+			type User struct {
 				EmailVerified bool
 				UserID, Email string
 			}
 
 			// Set authenticated user data into local context
-			c.Locals(cfg.ContextKey, user{
+			c.Locals(cfg.ContextKey, User{
 				Email:         token.Claims["email"].(string),
 				EmailVerified: token.Claims["email_verified"].(bool),
 				UserID:        token.Claims["user_id"].(string),
