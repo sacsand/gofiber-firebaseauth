@@ -12,6 +12,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type User struct {
+	EmailVerified bool
+	UserID, Email string
+}
+
 // Config defines the config for middleware
 type Config struct {
 
