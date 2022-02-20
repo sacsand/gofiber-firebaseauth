@@ -74,7 +74,10 @@ Use user in your fiber app
 func Handler(ctx *fiber.Ctx) error {
 	// Get user stored in context
 	// Default: user
-	ctx.Locals("user")
+	currentUser := ctx.Locals("user").(gofiberfirebaseauth.User)
+	fmt.Println(currentUser)
+	fmt.Println(currentUser.Email)
+
 }
 ```
 
@@ -96,17 +99,6 @@ All available configuration
  #### Note2
 You **must** provide already initialized `FirebaseApp` app.
 You cannot initialize two firebase apps.
-
-This package adds the `user` object returned by firebase to context key `user`. You can use that inside your functions.
-(you have option to configure the ContextKey. Check the configuration table above )
-
-user object type
-```
-type user struct{
-	emailVerified bool
-	userID, email string
-}
-```
 
  #### Note3
   Ignore url accept array of string. URl format should follow below format\
